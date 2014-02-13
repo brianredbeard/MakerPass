@@ -9,4 +9,3 @@ See the schematic for pending task list
 - 6x Inputs (5V analog compatible)
 - 6x Outputs (5V level)
 - Onboard power 5V regulator for logic
-- 
