@@ -1,0 +1,76 @@
+Partlist
+
+Exported from Wiegand.sch at 12/29/2013 12:03:33 PM
+
+EAGLE Version 6.5.0 Copyright (c) 1988-2013 CadSoft
+
+Assembly variant: 
+
+Part     Value           Device                   Package                  Library               Sheet
+
+C2       100nF           CAP0603-CAP              0603-CAP                 SparkFun              1
+C4       47uF            CPOL-EUD                 PANASONIC_D              rcl                   1
+C5       22pF            CAP0603-CAP              0603-CAP                 SparkFun              1
+C6       22pF            CAP0603-CAP              0603-CAP                 SparkFun              1
+C7       100nF           CAP0603-CAP              0603-CAP                 SparkFun              1
+F1       PTCSMD          PTCSMD                   PTC-1206                 SparkFun              1
+IC1                      MC33269ST-3.3T3          SOT223                   linear                1
+J1       AVR_SPI_PRG_6NS AVR_SPI_PRG_6NS          2X3-NS                   SparkFun-Connectors   1
+JP1      PWR             M023.5MM                 SCREWTERMINAL-3.5MM-2    SparkFun              1
+JP2                      JUMPER-2PTH              1X02                     SparkFun              1
+JP3                      JUMPER-2PTH              1X02                     SparkFun              1
+JP4                      JUMPER-2PTH              1X02                     SparkFun              1
+JP5                      JUMPER-2PTH              1X02                     SparkFun              1
+JP12                     M04SCREW                 SCREWTERMINAL-3.5MM-4    SparkFun-Connectors   1
+JP22                     M04SCREW                 SCREWTERMINAL-3.5MM-4    SparkFun-Connectors   1
+LED1     GRN             LED-0805                 LED-805                  dp_devices            1
+LED2     RX              LED-0805                 LED-805                  dp_devices            1
+LED3     TX              LED-0805                 LED-805                  dp_devices            1
+LED4     GRN             LED-0805                 LED-805                  dp_devices            1
+LED5     RED             LED-0805                 LED-805                  dp_devices            1
+LED6     RED             LED-0805                 LED-805                  dp_devices            1
+LED7     RED             LED-0805                 LED-805                  dp_devices            1
+LED8     RED             LED-0805                 LED-805                  dp_devices            1
+LED9     RED             LED-0805                 LED-805                  dp_devices            1
+LED10    RED             LED-0805                 LED-805                  dp_devices            1
+LED11    OUTPUT2         LED-0805                 LED-805                  dp_devices            1
+LED12    OUTPUT1         LED-0805                 LED-805                  dp_devices            1
+LED13    OUTPUT3         LED-0805                 LED-805                  dp_devices            1
+LED14    OUTPUT4         LED-0805                 LED-805                  dp_devices            1
+LED15    OUTPUT5         LED-0805                 LED-805                  dp_devices            1
+LED16    OUTPUT6         LED-0805                 LED-805                  dp_devices            1
+LED17    STATUS          LED-0805                 LED-805                  dp_devices            1
+R1       4k7             RESISTOR0603-RES         0603-RES                 SparkFun              1
+R2       440             RESISTOR0603-RES         0603-RES                 SparkFun              1
+R3       440             RESISTOR0603-RES         0603-RES                 SparkFun              1
+R4       440             RESISTOR0603-RES         0603-RES                 SparkFun              1
+R5       440             RESISTOR0603-RES         0603-RES                 SparkFun              1
+R6       440             RESISTOR0603-RES         0603-RES                 SparkFun              1
+R7       440             RESISTOR0603-RES         0603-RES                 SparkFun              1
+R8       440             RESISTOR0603-RES         0603-RES                 SparkFun              1
+R9       440             RESISTOR0603-RES         0603-RES                 SparkFun              1
+R10      440             RESISTOR0603-RES         0603-RES                 SparkFun              1
+R11      440             RESISTOR0603-RES         0603-RES                 SparkFun              1
+R12      440             RESISTOR0603-RES         0603-RES                 SparkFun              1
+R13      440             RESISTOR0603-RES         0603-RES                 SparkFun              1
+R14      1K              RESISTOR0603-RES         0603-RES                 SparkFun              1
+R15      100             RESISTOR0603-RES         0603-RES                 SparkFun              1
+R16      1K              RESISTOR0603-RES         0603-RES                 SparkFun              1
+R18      1K              RESISTOR0603-RES         0603-RES                 SparkFun              1
+R19      440             RESISTOR0603-RES         0603-RES                 SparkFun              1
+R20      440             RESISTOR0603-RES         0603-RES                 SparkFun              1
+R21      440             RESISTOR0603-RES         0603-RES                 SparkFun              1
+R22      440             RESISTOR0603-RES         0603-RES                 SparkFun              1
+S2       RESET           TAC_SWITCHSMD            TACTILE_SWITCH_SMD       SparkFun              1
+U1       ATMEGA168       ATMEGA168                TQFP32-08                SparkFun-DigitalIC    1
+U2       RS485_SP491     RS485_SP491              SOIC-14                  SparkFun              1
+U4       MOC3063         MOC3063S                 DIP8SMD                  SparkFun-DiscreteSemi 1
+U5       MOC3063         MOC3063S                 DIP8SMD                  SparkFun-DiscreteSemi 1
+U6       MOC3063         MOC3063S                 DIP8SMD                  SparkFun-DiscreteSemi 1
+U7       MOC3063         MOC3063S                 DIP8SMD                  SparkFun-DiscreteSemi 1
+U8       MOC3063         MOC3063S                 DIP8SMD                  SparkFun-DiscreteSemi 1
+U9       MOC3063         MOC3063S                 DIP8SMD                  SparkFun-DiscreteSemi 1
+X1                       CON-1X12-TERMBLOCK-3.5MM CON-1X12-TERMBLOCK-3.5MM LumisenseV6           1
+X2                       CON-1X12-TERMBLOCK-3.5MM CON-1X12-TERMBLOCK-3.5MM LumisenseV6           1
+X3                       CON-1X12-TERMBLOCK-3.5MM CON-1X12-TERMBLOCK-3.5MM LumisenseV6           1
+Y1       16Mhz           CRYSTALSMD               HC49UP                   SparkFun              1

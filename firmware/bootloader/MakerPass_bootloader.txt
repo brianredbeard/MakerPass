@@ -1,0 +1,22 @@
+*unlocks chip and uses internal 8mhz oscillator*
+avrdude -p m168 -c avrisp -b 19200 -P com38 -e -U lfuse:w:0xd4:m -U hfuse:w:0x99:m
+avrdude -p m168 -c usbasp -b 19200 -P usb -e -U lfuse:w:0xd4:m -U hfuse:w:0x99:m
+
+*unlocks chip and uses external 16mhz oscillator*
+VIA http://www.pocketmagic.net/2013/03/how-to-set-the-avr-fusebits/
+avrdude -p atmega168 -c usbasp -U lfuse:w:0xdf:m -U hfuse:w:0xDF:m -U efuse:w:0xF9:m -U lock:w:0xFF:m
+
+*unlock bootloader*
+avrdude -p m168 -c usbasp -b 19200 -P usb -U  lock:w:0x3F:m
+
+*flash arduino bootloader*
+cd C:\Program Files (x86)\Arduino\arduino-1.0.5\hardware\arduino\bootloaders\atmega
+avrdude -p m168 -c usbasp -b 19200 -P usb -e -U flash:w:AtmegaBOOT_168_diecimila.hex
+
+
+*lock the bootloader in*
+avrdude -p m168 -c avrisp -b 19200 -P com38 -U lock:w:0x0f:m
+
+*upload a hex file(or arduino sketch if you may call it. still a hex file)*
+avrdude -p m168 -c avrisp -b 19200 -P com38 -U flash:w:blinkEverything.cpp.hex
+avrdude -p m168 -c usbasp -b 19200 -P usb -U flash:w:blinkEverything.cpp.hex
