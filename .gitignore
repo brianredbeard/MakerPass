@@ -34,3 +34,8 @@ eagle.epf
 *.info
 
 *.eps
+node_modules
+bower_components
+coverage
+Controller/config
+Controller/npm-debug.log

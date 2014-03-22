@@ -1,0 +1,49 @@
+extends layout
+
+block content
+  form( role="form" )
+
+  .row
+    .col-md-6
+      .input-group
+        span.input-group-addon
+          label( for="nodeId" ) Node ID
+        input.form-control#nodeId( type="text" value=nodeId )
+        //span.input-group-addon
+          button.btn( type="button" ) Update
+    .col-md-6
+      .input-group
+        span.input-group-addon
+          label( for="cardNumber" ) Card Number
+        input.form-control#cardNumber( type="text" placeholder="123456" )
+        //span.input-group-addon
+          button.btn( type="button" ) Update
+    .col-md-6
+      table.table
+        thead
+          tr
+            th #
+            th Input Value
+        tbody
+          - for ( var i = 0 ; i < inputs ; i++ ) {
+            tr
+              td= i
+              td
+                //input.slider( id="input"+i data-slider-id="inputslider"+i type="text" data-slider-max="1023")
+                input.slider( id="input"+i type="text" value="0" )
+          - }
+    .col-md-6
+      table.table
+        thead
+          tr
+            th #
+            th Output Status
+        tbody
+          - for ( var i = 0 ; i < outputs ; i++ ) {
+            tr
+              td= i
+              td
+                input.switch( id="output"+i type="checkbox" )
+          - }
+      
+  script( src="/fake-node.js" )
