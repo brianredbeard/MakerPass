@@ -7,4 +7,11 @@ var MPEvent = module.exports = util.emitter( 'MPEvent', [
 
 MPEvent.prototype.init = function init() {
     this.id = this.event;
+    this.toJSON = function() {
+        return {
+            event       : this.event,
+            actions     : this.actions,
+            lastfired   : this.lastfired,
+        };
+    };
 };

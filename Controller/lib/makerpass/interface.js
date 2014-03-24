@@ -3,6 +3,7 @@ var _ = require( 'underscore' ),
     util = require( 'util' );
 
 function MPInterface( config ) {
+    if ( typeof config === 'string' ) config = { type : config };
     EventEmitter.call( this, config );
 
     // figure out the interface type
@@ -12,19 +13,21 @@ function MPInterface( config ) {
 
     // load the type-specific mixin
     var mixin = require( './interface/' + type );
-    _.extend( this, mixin );
+    _.extend( this, mixin, config );
 
     // find the defaults
-    var defaults = {
-    };
-    _.extend( this, defaults, mixin.defaults, config );
+    _.defaults( this, mixin.defaults, {
+        // local defaults to be added here
+    } );
 
     // override things that shouldn't be configured
-    this.buffer = '';
-    this.status = 'stopped';
-    this.lastMessageTime = 0;
-    this.totalMessages = 0;
-    this.nodes = {};
+    _.extend( this, {
+        buffer              : '',
+        status              : 'stopped',
+        lastMessageTime     : 0,
+        totalMessages       : 0,
+        nodes               : {},
+    } );
 
     // initialize
     this.initialize();
@@ -32,10 +35,32 @@ function MPInterface( config ) {
 util.inherits( MPInterface, EventEmitter );
 module.exports = MPInterface;
 
+MPInterface.prototype.toJSON = function toJSON() {
+    return { id : this.id };
+    return _.pick( this,
+        'type', 'name', 'desc', 'status', 'lastMessageTime',
+        'totalMessages'
+    );
+};
+
 MPInterface.prototype.claimnode = function claimnode( node ) {
     this.nodes[ node.id ] = node;
     node.interface = this;
 };
+
+MPInterface.prototype.node = function node( id ) {
+  return _.find( this.nodes, function( node ) {
+      return node.id == id || node.name == id;
+  } );
+};
+
+MPInterface.prototype.send = function send( target, message ) {
+    if ( ~ target.indexOf( '*' ) ) {
+        console.log( 'wildcard! (in interface)' );
+    } else {
+    }
+};
+
 
 MPInterface.prototype.onData = function onData( data ) {
     console.log( 'data: ' + data );

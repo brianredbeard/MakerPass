@@ -1,10 +1,10 @@
 ---
 # First we define a unique id for this node
-nodeid: ex1
+id: missiles-example
 # And maybe add a description (this is optional)
 description: Missile Launching Example
 # We can specifically associate a node to an interface
-interface: fake
+interface: Fake
 # Define our inputs...  For this node we have 3 inputs defined.  The key for
 # each input is the input number on the MakerPass node circuit board.
 inputs:

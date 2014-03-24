@@ -84,18 +84,18 @@ describe( 'node', function() {
             node.events.should.have.length( 2 );
         } );
     } );
-    describe( '.addobj', function() {
+    describe( '.addval', function() {
         it( 'should exist', function() {
-            node.should.have.property( 'addobj' );
+            node.should.have.property( 'addval' );
         } );
         it( 'should be a function', function() {
-            node.addobj.should.be.a( 'function' );
+            node.addval.should.be.a( 'function' );
         } );
         it( 'should throw if called without type ', function() {
-            should.Throw( function() { node.addobj() } );
+            should.Throw( function() { node.addval() } );
         } );
         it( 'should throw if called with invalid type ', function() {
-            should.Throw( function() { node.addobj( 'blah', {} ) } );
+            should.Throw( function() { node.addval( 'blah', {} ) } );
         } );
     } );
 } );

@@ -1,68 +1,58 @@
 var _ = require( 'underscore' ),
     chai = require( 'chai' ),
-    should = chai.should();
+    should = chai.should(),
+    path = require( 'path' );
+
+var testconfig = {
+    interfaces  : [ 'Fake', { type : 'Fake', id : 'FakeTwo' } ],
+    nodes       : [],
+};
 
 describe( 'makerpass', function() {
 
-    var makerpass = require( '../lib/makerpass' );
+    var MakerPass = require( '..' );
+    var makerpass = new MakerPass( testconfig );
 
     describe( '.nodes', function() {
-        it( 'should be an array', function() {
+        it( 'should exist', function() {
             makerpass.should.have.property( 'nodes' );
-            makerpass.nodes.should.be.an( 'array' ).with.length( 0 );
+        } );
+        var len = testconfig.nodes.length;
+        it ( 'should be a ' + len + '-element array', function() {
+            makerpass.nodes.should.be.an( 'array' ).with.length( len );
         } );
     } );
     describe( '.interfaces', function() {
-        it( 'should be an array', function() {
+        it( 'should exist', function() {
             makerpass.should.have.property( 'interfaces' );
-            makerpass.interfaces.should.be.an( 'array' ).with.length( 0 );
+        } );
+        var len = testconfig.interfaces.length;
+        it( 'should be a ' + len + '-element array', function() {
+            makerpass.interfaces.should.be.an( 'array' ).with.length( len );
         } );
     } );
-    describe( '.webserver', function() {
-        it( 'should be a function', function() {
-            makerpass.should.have.property( 'webserver' );
-            makerpass.webserver.should.be.a( 'function' );
+    describe( '.dir', function() {
+        it( 'should exist', function() {
+            makerpass.should.have.property( 'dir' );
         } );
-    } );
-    describe( '.configloaded', function() {
-        it( 'should be false', function() {
-            makerpass.should.have.property( 'configloaded' );
-            makerpass.configloaded.should.be.a( 'boolean' );
-            makerpass.configloaded.should.be.false;
-        } );
-    } );
-    describe( '.appdir', function() {
         it( 'should be a string', function() {
-            makerpass.should.have.property( 'appdir' );
-            makerpass.appdir.should.be.a( 'string' );
+            makerpass.dir.should.be.a( 'string' );
+        } );
+        it( 'should be the directory just above the tests', function() {
+            var dir = path.resolve( module.filename, '..', '..' );
+            makerpass.dir.should.equal( dir );
         } );
     } );
-    describe( '.webport', function() {
-        it( 'should be a number', function() {
-            makerpass.should.have.property( 'webport' );
-            makerpass.webport.should.be.a( 'number' );
-            makerpass.webport.should.equal( 3000 );
+    describe.skip( '.webconfig', function() {
+        it( 'should be an object', function() {
+            makerpass.should.have.property( 'webconfig' );
+            makerpass.webconfig.should.be.an( 'object' );
         } );
     } );
     describe( '.start', function() {
         it( 'should be a function', function() {
             makerpass.should.have.property( 'start' );
             makerpass.start.should.be.a( 'function' );
-        } );
-    } );
-    describe( '.loadconfig', function() {
-        it( 'should be a function', function() {
-            makerpass.should.have.property( 'loadconfig' );
-            makerpass.loadconfig.should.be.a( 'function' );
-        } );
-        it( 'should load the test configs', function() {
-            makerpass.loadconfig( __dirname + '/config' ).should.be.true;
-        } );
-        it( 'should load one interface', function() {
-            makerpass.interfaces.should.have.length( 1 );
-        } );
-        it( 'should load one node', function() {
-            makerpass.nodes.should.have.length( 1 );
         } );
     } );
 } );

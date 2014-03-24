@@ -1,10 +1,10 @@
 extends layout
 
 block content
-  form( role="form" )
+  form.form-horizontal( role="form" )
 
   .row
-    h1 Node "#{node.id}"
+    h1 Node "<span id="nodeid">#{node.id}</span>"
 
   .row
     .col-md-6
@@ -57,6 +57,7 @@ block content
                   td= variable.value
 
     .col-md-6
+
       .panel.panel-default
         .panel-heading
           h3.panel-title Information
@@ -74,9 +75,33 @@ block content
             tr
               th Total Messages
               td= node.totalMessages
+
+      if node.fake
+        .panel.panel-default
+          .panel-heading
+            h3.panel-title Fake Node Debugging
+          .panel-body
+            .row
+              .form-group
+                label.col-sm-3.control-label( for="sendmesg" ) Raw Message
+                .col-sm-9
+                  input.form-control#sendmesg( type="text" )
+            .row
+              .form-group
+                label.col-sm-3.control-label( for="sendcard" ) Fake Card
+                .col-sm-9
+                  input.form-control#sendcard( type="text" )
+
+      if node.fake
+        .panel.panel-default
+          .panel-heading
+            h3.panel-title Message Log
+          .panel-body
+            ul#msglog
+
           //.input-group
             span.input-group-addon
               label( for="cardNumber" ) Card Number
             input.form-control#cardNumber( type="text" )
-
-  script( src="/fake-node.js" )
+  - var nodeconf = JSON.stringify( node, null, '    ' );
+  script!= "\nvar node = new MPNode( " + nodeconf + " );\n"

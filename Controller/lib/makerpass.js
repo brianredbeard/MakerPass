@@ -4,38 +4,58 @@ var _ = require( 'underscore' ),
     path = require( 'path' ),
     yaml = require( 'js-yaml' ),
     fs = require( 'fs' ),
-    glob = require( 'glob' ),
-    MPNode = require( './makerpass/node' ),
-    MPInterface = require( './makerpass/interface' ),
-    MPWebServer = require( './makerpass/webserver' );
+    util = require( './makerpass/util' );
 
-var makerpass = exports;
+function MakerPass( config ) {
+    this.dir = util.home;
+    this.config = config;
+    this.nodes = [];
+    this.interfaces = [];
 
-makerpass.configloaded = false;
-makerpass.appdir = path.dirname( require.main.filename );
+    _.extend( this, _.omit( config, 'nodes', 'interfaces' ) );
 
-var nodes = makerpass.nodes = [];
+    _.each( config.interfaces || [], this.addInterface.bind( this ) );
+    _.each( config.nodes || [], this.addNode.bind( this ) );
+};
 
-makerpass.addnode = function addnode( cfg ) {
-    var node = new MPNode( cfg );
-    nodes.push( node );
-    /*
-    if ( typeof node.interface == 'string' ) {
-        node.interface = makerpass.interface( node.interface );
+MakerPass.prototype.send = function send( target, message ) {
+    if ( ~ target.indexOf( '*' ) ) {
+        console.log( 'wildcard! (in makerpass)' );
+        _.each( this.interfaces, function( interface ) {
+            interface.send( target, message );
+        } );
+    } else {
+        var node = this.node( target );
+        node.send( message );
     }
-    */
+};
+
+MakerPass.prototype.addNode = function addNode( cfg ) {
+    console.log( "ADDNODE:", cfg );
+    var MPNode = require( './makerpass/node' );
+    var node = new MPNode( cfg );
+    if ( node.fake ) { // TODO - move this to the fake interface
+        node.on( 'send', function( msg ) {
+            if ( ! makerpass.webserver ) {
+                console.error( 'Received packet with no way to retransmit' );
+                return;
+            }
+            console.log( 'RTS', node.id, msg );
+            makerpass.webserver.sockets.emit( 'message', node.id + ' ' + msg );
+        } );
+    }
+    this.nodes.push( node );
     return node;
 };
 
-makerpass.node = function node( id ) {
-    return _.find( nodes, function( node ) {
+MakerPass.prototype.node = function node( id ) {
+    return _.find( this.nodes, function( node ) {
         return node.id == id || node.name == id;
     } );
 };
 
-var interfaces = makerpass.interfaces = [];
-
-makerpass.addinterface = function addinterface( cfg ) {
+MakerPass.prototype.addInterface = function addInterface( cfg ) {
+    var MPInterface = require( './makerpass/interface' );
     var iface = new MPInterface( cfg );
 
     iface.on( "message", function( message ) {
@@ -45,61 +65,85 @@ makerpass.addinterface = function addinterface( cfg ) {
         console.error( err );
     } );
 
-    iface.idx = interfaces.length;
+    iface.idx = this.interfaces.length;
     iface.name = iface.getname();
 
-    interfaces.push( iface );
+    this.interfaces.push( iface );
+    return iface;
 };
 
-makerpass.interface = function interface( id ) {
-    return _.find( interfaces, function( int ) {
+MakerPass.prototype.interface = function interface( id ) {
+    return _.find( this.interfaces, function( int ) {
         return int.id == id;
-    } ) || _.find( interfaces, function( int ) {
+    } ) || _.find( this.interfaces, function( int ) {
         return int.name == id;
-    } ) || _.find( interfaces, function( int ) {
+    } ) || _.find( this.interfaces, function( int ) {
         return int.type == id;
     } );
 };
 
-makerpass.loadconfig = function loadconfig( dir ) {
-    if ( ! dir ) dir = path.join( makerpass.appdir, 'config' );
-
-    _.each( glob.sync( path.join( dir, 'interface*.yml' ) ), function( file ) {
-        var str = fs.readFileSync( file, 'utf8' );
-        yaml.safeLoadAll( str, makerpass.addinterface );
+MakerPass.prototype.loadNodes = function loadNodes( /* args */ ) {
+    var dir = this.dir;
+    var queue = _.map( _.flatten( arguments ), function( x ) {
+        return path.resolve( dir, x );
     } );
+    if ( ! queue.length )
+        throw new Error( "Can't loadNodes without directory or file" );
 
-    _.each( glob.sync( path.join( dir, 'node*.yml' ) ), function( file ) {
-        var str = fs.readFileSync( file, 'utf8' );
-        yaml.safeLoadAll( str, makerpass.addnode );
-    } );
-
-    _.each( makerpass.interfaces, function ( interface ) {
-        if ( typeof interface.MPinit === 'function' ) {
-            interface.MPinit( makerpass );
+    while ( queue.length > 0 ) {
+        var file = queue.shift();
+        var stat = fs.statSync( file );
+        if ( stat.isDirectory() ) {
+            _.each( fs.readdirSync( file ), function( x ) {
+                queue.push( path.resolve( file, x ) );
+            } );
+            continue;
         }
-    } );
-
-    _.each( makerpass.nodes, function( node ) {
-        if ( typeof node.MPinit === 'function' ) {
-            node.MPinit( makerpass );
+        var ext = path.extname( file );
+        var adder = this.addNode.bind( this );
+        if ( ext === '.js' ) {
+            var node = require( file );
+            if ( Array.isArray( node ) ) {
+                _.each( node, adder );
+            } else {
+                adder( node );
+            }
+        } else if ( ext === '.yml' || ext === '.yaml' ) {
+            var str = fs.readFileSync( file, 'utf8' );
+            yaml.safeLoadAll( str, adder );
+        } else {
+            console.log( "Skipping unknown extension:", file );
         }
-    } );
+    }
 
-    _.each( makerpass.nodes, function( node ) {
+/* TODO
+    _.each( this.nodes, function( node ) {
         if ( typeof node.interface === 'string' ) {
-            var iface = makerpass.interface( node.interface );
+            console.log( 'claiming interface!' );
+            var iface = this.interface( node.interface );
             if ( iface ) iface.claimnode( node );
         }
     } );
-
-    return makerpass.configloaded = true;
+*/
 };
 
-makerpass.webport = 3000;
-
-makerpass.start = function start() {
-    if ( ! makerpass.configloaded ) makerpass.loadconfig();
-    _.each( interfaces, function( iface ) { iface.start(); } );
-    makerpass.webserver = new MPWebServer( makerpass );
+MakerPass.prototype.start = function start() {
+    // Start the device interfaces
+    _.each( this.interfaces, function( iface ) { iface.start(); } );
+    // Start the web interface, unless it's been disabled
+    if ( ! this.webconfig.disable ) this.startweb();
 };
+
+MakerPass.prototype.startweb = function startweb() {
+    var webconf = this.webconfig = this.webconfig || {};
+    // If the web interface is disabled, then don't start it
+    if ( webconf.disable || webconf.disabled ) return false;
+
+    var MPWebServer = require( './makerpass/webserver' );
+    this.webserver = new MPWebServer( _.extend( {}, webconf, {
+        dir             : this.dir,
+    } ), { makerpass : this } );
+    return true;
+};
+
+module.exports = MakerPass;

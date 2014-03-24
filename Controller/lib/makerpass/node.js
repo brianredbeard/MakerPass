@@ -2,11 +2,22 @@ var _ = require( 'underscore' ),
     EventEmitter = require( 'events' ).EventEmitter,
     util = require( './util' );
 
+MPNode.toJSON = function toJSON() {
+    return { id : this.id };
+    return _.pick( this, 'id', 'authid' );
+};
+
 function MPNode( config ) {
     EventEmitter.call( this, config );
     this.objs = {};
+    this.toJSON = function toJSON() {
+        return _.pick( this, [
+            'id', 'authid', 'inputs', 'outputs', 'variables', 'events',
+            'lastMessageTime', 'totalMessages', 'lastCardScanned',
+        ] );
+    };
 
-    this.id = config.nodeid;
+    this.id = config.id;
     this.authid = config.authid;
     this.interface = null;
 
@@ -50,6 +61,11 @@ function MPNode( config ) {
     delete config.events;
 
     _.extend( this, config );
+
+    var node = this;
+    this.pingIntervalObject = setInterval( function() {
+        node.send( 'PING' );
+    }, 5000 );
 };
 util.inherits( MPNode, EventEmitter );
 module.exports = MPNode;
@@ -74,4 +90,14 @@ MPNode.prototype.addval = function addval( type, config ) {
     this.objs[ obj.id ] = obj;
     this[ type + 's' ].push( obj );
     return obj;
+};
+
+MPNode.prototype.send = function send( msg ) {
+    console.log( 'SENDING TO NODE', this.id, msg );
+    if ( ! this.interface ) {
+        console.error( 'Attempt to send to node without interface' );
+        return;
+    }
+    this.interface.send( this.id, msg );
+    // this.emit( 'send', msg );
 };
