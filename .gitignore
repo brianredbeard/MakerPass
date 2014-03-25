@@ -39,3 +39,5 @@ bower_components
 coverage
 Controller/npm-debug.log
 Controller/messages.txt
+Controller/test/npm-debug.log
+COntroller/nodeconfig

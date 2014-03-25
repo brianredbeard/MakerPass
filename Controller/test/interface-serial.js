@@ -10,11 +10,12 @@ SandboxedModule.require( '../lib/makerpass/interface', {
     requires    : { 'serialport' : SerialPort },
 } );
 
+var dev = '/dev/fakeserial';
 var testconfig = {
     type            : 'Serial',
-    path            : '/dev/fakeserial',
+    path            : dev,
 };
-hardware.createPort( '/dev/fakeserial' );
+hardware.createPort( dev );
 
 describe( 'interface.serial', function() {
     var MPInterface = require( '../lib/makerpass/interface' );
@@ -63,10 +64,10 @@ describe( 'interface.serial', function() {
             iface.should.have.property( 'start' );
             iface.start.should.be.a( 'function' );
         } );
-        it( 'should have .getname', function() {
-            iface.should.have.property( 'getname' );
-            iface.getname.should.be.a( 'function' );
-            iface.getname().should.equal( 'Serial Interface' );
+        it( 'should have .getName', function() {
+            iface.should.have.property( 'getName' );
+            iface.getName.should.be.a( 'function' );
+            iface.getName().should.equal( 'Serial Interface on ' + dev );
         } );
 
         it( 'should have .onData', function() {

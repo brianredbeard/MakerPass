@@ -17,8 +17,14 @@ function MPNode( config ) {
         ] );
     };
 
+    if ( ! config.id ) {
+        console.log( config );
+        throw new Error( "Cannot create MPNode without an id" );
+    }
     if ( config.id.length > 15 ) {
-        throw new Error( "Node ID cannot be more than 15 characters" );
+        throw new Error(
+            "Node ID cannot be more than 15 characters (" + config.id + ")"
+        );
     }
 
     this.id = config.id;

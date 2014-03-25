@@ -1,6 +1,6 @@
 ---
 # First we define a unique id for this node
-id: missiles-example
+id: missiles-ex
 # And maybe add a description (this is optional)
 description: Missile Launching Example
 # We can specifically associate a node to an interface

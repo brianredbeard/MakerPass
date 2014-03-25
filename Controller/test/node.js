@@ -3,7 +3,7 @@ var _ = require( 'underscore' ),
     should = chai.should();
 
 var testconfig = {
-    nodeid          : 'test',
+    id              : 'test',
     authid          : 'test.auth.id',
     inputs          : {
         1   : 'test_input_1',
