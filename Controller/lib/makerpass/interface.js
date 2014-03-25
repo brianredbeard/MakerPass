@@ -21,13 +21,11 @@ function MPInterface( config ) {
     } );
 
     // override things that shouldn't be configured
-    _.extend( this, {
-        buffer              : '',
-        status              : 'stopped',
-        lastMessageTime     : 0,
-        totalMessages       : 0,
-        nodes               : {},
-    } );
+    this.buffer = "";
+    this.status = 'stopped';
+    this.lastMessageTime = 0;
+    this.totalMessages = 0;
+    this.nodes = {};
 
     // initialize
     this.initialize();
@@ -54,16 +52,16 @@ MPInterface.prototype.node = function node( id ) {
   } );
 };
 
-MPInterface.prototype.send = function send( target, message ) {
-    if ( ~ target.indexOf( '*' ) ) {
-        console.log( 'wildcard! (in interface)' );
-    } else {
-    }
-};
-
-
 MPInterface.prototype.onData = function onData( data ) {
-    console.log( 'data: ' + data );
+    if ( typeof data == 'object' && data instanceof Buffer ) {
+        data = data.toString( 'utf8' );
+    }
+    this.buffer += data;
+    var parts = this.buffer.split( /[\r\n]+/ );
+    if ( parts.length > 1 ) {
+        this.buffer = parts.pop();
+        console.log( parts );
+    }
 };
 
 MPInterface.prototype.onClose = function onClose( ) {
@@ -77,6 +75,7 @@ MPInterface.prototype.onError = function onError( err ) {
 
 MPInterface.prototype.seterror = function seterror( err ) {
     this.error = err;
+    console.error( err );
     this.status = 'error';
 };
 
@@ -89,7 +88,7 @@ MPInterface.prototype.start = function start() {
     }
 };
 
-MPInterface.prototype.getname = function getname() {
+MPInterface.prototype.getName = function getName() {
     return this.type + ' Interface';
 };
 

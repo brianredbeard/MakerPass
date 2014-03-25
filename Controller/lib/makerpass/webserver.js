@@ -3,16 +3,19 @@ var _ = require( 'underscore' ),
     path = require( 'path' );
 
 function MPWebServer( config ) {
-    var config = _.defaults( config, {
-    } );
+    _.extend( this, config );
+
     var app = this.app = express();
 
-    this.server = app.listen( this.port, function() {
-        console.log( "MakerPass Web Server listening on port " + this.port );
+    var port = this.port;
+    this.server = app.listen( port, function() {
+        console.log( "MakerPass Web Server listening on port " + port );
     } );
     this.io = require( 'socket.io' ).listen( this.server );
     this.sockets = this.io.sockets;
     
+    console.log( "DIR: ", this.dir );
+
     var views = this.views || path.resolve( this.dir || './', 'views' );
     app.set( 'views', views );
     app.set( 'view engine', 'jade' );
@@ -23,7 +26,7 @@ function MPWebServer( config ) {
     //app.disable( 'etag' );
 
     var public = this.public || path.resolve( this.dir, 'public' );
-    var favicon = this.favicon || path.resolve( this.public, 'favicon.ico' );
+    var favicon = this.favicon || path.resolve( public, 'favicon.ico' );
     var logger = this.logger || 'dev';
     app.use( express.favicon( favicon ) );
     app.use( express.logger( logger ) );
@@ -37,6 +40,7 @@ function MPWebServer( config ) {
  
     app.use( express.errorHandler() );
  
+    var makerpass = this.makerpass;
     app.get( '/', function( req, res ) {
         res.render( 'index', {
             interfaces  : makerpass.interfaces,
@@ -45,21 +49,17 @@ function MPWebServer( config ) {
             } ),
         } );
     } );
-    app.get( '/nodes', function( req, res ) { res.render( 'nodes' ); } );
+    app.get( '/nodes', function( req, res ) {
+        res.render( 'nodes', {
+            nodes   : makerpass.nodes,
+        } );
+    } );
     app.get( '/node/:id', function( req, res ) {
         var node = makerpass.node( req.params.id );
         res.render( 'node', { node : node } );
     } );
-
-    var self = this;
-    self.sockets.on( 'connection', function ( socket ) {
-        console.log( 'new connection' );
-        socket.emit( 'message', '* IDENT' );
-        /*
-        socket.on( 'send', function ( data ) {
-            self.sockets.emit( 'message', data );
-        } );
-        */
+    app.post( '/message/:target', function( req, res ) {
+        makerpass.send( req,params.target, req.params.message );
     } );
 };
 module.exports = MPWebServer;

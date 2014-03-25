@@ -2,7 +2,7 @@ var _ = require( 'underscore' ),
     util = require( '../util' );
 
 var MPInput = module.exports = util.emitter( 'MPInput', [
-    'id', 'pin', 'name', 'value', 'state', 'lastChanged'
+    'id', 'pin', 'name', 'value', 'state', 'lastChanged', 'threshold',
 ] );
 
 MPInput.prototype.init = function init() {
@@ -10,6 +10,9 @@ MPInput.prototype.init = function init() {
     this.value = null;
     this.state = null;
     this.lastChanged = null;
+    _.defaults( this, {
+        threshold   : 512,
+    } );
 
     if ( ! this.name )
         throw new Error( "Can't create MPInput without name" );

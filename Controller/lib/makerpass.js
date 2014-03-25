@@ -20,7 +20,6 @@ function MakerPass( config ) {
 
 MakerPass.prototype.send = function send( target, message ) {
     if ( ~ target.indexOf( '*' ) ) {
-        console.log( 'wildcard! (in makerpass)' );
         _.each( this.interfaces, function( interface ) {
             interface.send( target, message );
         } );
@@ -31,18 +30,11 @@ MakerPass.prototype.send = function send( target, message ) {
 };
 
 MakerPass.prototype.addNode = function addNode( cfg ) {
-    console.log( "ADDNODE:", cfg );
     var MPNode = require( './makerpass/node' );
     var node = new MPNode( cfg );
-    if ( node.fake ) { // TODO - move this to the fake interface
-        node.on( 'send', function( msg ) {
-            if ( ! makerpass.webserver ) {
-                console.error( 'Received packet with no way to retransmit' );
-                return;
-            }
-            console.log( 'RTS', node.id, msg );
-            makerpass.webserver.sockets.emit( 'message', node.id + ' ' + msg );
-        } );
+    if ( typeof node.interface == 'string' ) {
+        var int = this.interface( node.interface );
+        if ( int ) int.claimnode( node );
     }
     this.nodes.push( node );
     return node;
@@ -57,6 +49,7 @@ MakerPass.prototype.node = function node( id ) {
 MakerPass.prototype.addInterface = function addInterface( cfg ) {
     var MPInterface = require( './makerpass/interface' );
     var iface = new MPInterface( cfg );
+    iface.makerpass = this;
 
     iface.on( "message", function( message ) {
         console.log( 'message: ', message );
@@ -66,7 +59,7 @@ MakerPass.prototype.addInterface = function addInterface( cfg ) {
     } );
 
     iface.idx = this.interfaces.length;
-    iface.name = iface.getname();
+    iface.name = iface.getName();
 
     this.interfaces.push( iface );
     return iface;
@@ -128,10 +121,10 @@ MakerPass.prototype.loadNodes = function loadNodes( /* args */ ) {
 };
 
 MakerPass.prototype.start = function start() {
-    // Start the device interfaces
-    _.each( this.interfaces, function( iface ) { iface.start(); } );
     // Start the web interface, unless it's been disabled
     if ( ! this.webconfig.disable ) this.startweb();
+    // Start the device interfaces
+    _.each( this.interfaces, function( iface ) { iface.start(); } );
 };
 
 MakerPass.prototype.startweb = function startweb() {
@@ -139,10 +132,17 @@ MakerPass.prototype.startweb = function startweb() {
     // If the web interface is disabled, then don't start it
     if ( webconf.disable || webconf.disabled ) return false;
 
+    var cfg = {
+        port    : 3000,
+    };
+    if ( this.webconfig ) {
+        _.extend( cfg, this.webconfig );
+    }
+    cfg.dir = this.dir;
+    cfg.makerpass = this;
+
     var MPWebServer = require( './makerpass/webserver' );
-    this.webserver = new MPWebServer( _.extend( {}, webconf, {
-        dir             : this.dir,
-    } ), { makerpass : this } );
+    this.webserver = new MPWebServer( cfg );
     return true;
 };
 

@@ -17,6 +17,10 @@ function MPNode( config ) {
         ] );
     };
 
+    if ( config.id.length > 15 ) {
+        throw new Error( "Node ID cannot be more than 15 characters" );
+    }
+
     this.id = config.id;
     this.authid = config.authid;
     this.interface = null;
@@ -26,46 +30,41 @@ function MPNode( config ) {
     this.variables = [];
     this.events = [];
 
+    _.extend( this, _.omit( config,
+        'inputs', 'outputs', 'events', 'variables'
+    ) );
+
     this.lastMessageTime = 0;
     this.totalMessages = 0;
     this.lastCardScanned = '';
 
     _.each( config.inputs, function( cfg, which ) {
-        if ( typeof cfg === 'string' ) cfg = { name : cfg };
-        cfg.pin = 'INPUT' + which;
+        if ( typeof cfg === 'string' )
+            cfg = { name : cfg, pin : 'INPUT' + which };
         this.addval( 'input', cfg );
     }, this );
-    delete config.inputs;
 
     _.each( config.outputs, function( cfg, which ) {
-        if ( typeof cfg === 'string' ) cfg = { name : cfg };
-        cfg.pin = 'OUTPUT' + which;
+        if ( typeof cfg === 'string' )
+            cfg = { name : cfg, pin : 'OUTPUT' + which };
         this.addval( 'output', cfg );
     }, this );
-    delete config.outputs;
 
     _.each( config.variables, function( cfg, name ) {
         if ( typeof cfg === 'string' ) cfg = { type : cfg };
         cfg.name = name;
         this.addval( 'variable', cfg );
     }, this );
-    delete config.variables;
 
     _.each( config.events, function( actions, event ) {
         if ( typeof actions === 'string' ) actions = [ actions ];
-        this.addval( 'event', {
-            event       : event,
-            actions     : actions,
-        } );
+        this.addval( 'event', { event : event, actions : actions } );
     }, this );
-    delete config.events;
-
-    _.extend( this, config );
 
     var node = this;
     this.pingIntervalObject = setInterval( function() {
         node.send( 'PING' );
-    }, 5000 );
+    }, 60000 );
 };
 util.inherits( MPNode, EventEmitter );
 module.exports = MPNode;
@@ -99,5 +98,4 @@ MPNode.prototype.send = function send( msg ) {
         return;
     }
     this.interface.send( this.id, msg );
-    // this.emit( 'send', msg );
 };

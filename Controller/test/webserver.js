@@ -16,33 +16,66 @@ request(app)
   });
 */
 
+var testconfig = {
+    webconfig   : {
+        port        : TEST_PORT,
+    },
+};
 
 describe( 'makerpass.webserver', function() {
 
-    var makerpass = require( '../lib/makerpass' );
-    makerpass.webport = TEST_PORT;
+    var MakerPass = require( '../' );
+    var makerpass = new MakerPass( testconfig );
     makerpass.start();
 
     var ws = makerpass.webserver;
 
-    request = request( 'http://localhost:' + TEST_PORT + '/' );
-
     describe( '.dir', function() {
-        it( 'should be a string', function() {
+        it( 'should exist', function() {
             ws.should.have.property( 'dir' );
+        } );
+        it( 'should be a string', function() {
             ws.dir.should.be.a( 'string' );
         } );
-    } );
-    describe( '.port', function() {
-        it( 'should be a number', function() {
-            ws.should.have.property( 'port' );
-            ws.port.should.be.a( 'number' );
+        it( 'should match makerpass.dir', function() {
+            ws.dir.should.equal( makerpass.dir );
         } );
     } );
+
+    describe( '.port', function() {
+        it( 'should exist', function() {
+            ws.should.have.property( 'port' );
+        } );
+        it( 'should be a number', function() {
+            ws.port.should.be.a( 'number' );
+        } );
+        it( 'should be set to TEST_PORT', function() {
+            ws.port.should.equal( TEST_PORT );
+        } );
+    } );
+
     describe( '.server', function() {
-        it( 'should be an object', function() {
+        it( 'should exist', function() {
             ws.should.have.property( 'server' );
+        } );
+        it( 'should be an object', function() {
             ws.server.should.be.an( 'object' );
+        } );
+    } );
+
+    describe( 'Web Requests', function() {
+        request = request.agent( 'http://localhost:' + TEST_PORT );
+
+        it( 'should deliver the home page for /', function( done ) {
+            request.get( '/' )
+                .expect( 'Content-Type', /html/ )
+                .expect( 200, done );
+        } );
+
+        it( 'should deliver a node list for /nodes', function( done ) {
+            request.get( '/nodes' )
+                .expect( 'Content-Type', /html/ )
+                .expect( 200, done );
         } );
     } );
 

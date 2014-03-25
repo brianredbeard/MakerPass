@@ -2,6 +2,7 @@ extends layout
 
 block content
   .row
+    h1 MakerPass System Status
     each iface,idx in interfaces
       .panel.panel-info
         .panel-heading
@@ -50,6 +51,8 @@ block content
                       td= node.outputs.length
                       td= node.variables.length
                       td= node.events.length
+        if iface.error
+          p.bg-danger= iface.error
   
   .row
     .panel.panel-info

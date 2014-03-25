@@ -1,22 +1,22 @@
 var _ = require( 'underscore' ),
-    Tail = require( 'tail' );
+    fs = require( 'fs' );
 
-exports.defaults = {
-    path        : '/tmp/makerpass-interface-data',
-};
+exports.defaults = { path : '/tmp/makerpass-messages' };
 
 exports.openstream = function openstream() {
-    var self = this;
-    var tail = new Tail( self.path );
-    tail.on( 'line', self.onData, self );
-    tail.on( 'error', self.onError, self );
-};
-
-exports.write = function write( string ) {
-    this.port.write( string + "\n", function( err, results ) {
-        console.log( 'err: ' + err );
-        console.log( 'results: ' + results );
+    this.stream = fs.createReadStream( this.path, {
+        flags       : 'r',
+        encoding    : 'utf8',
+        autoClose   : false,
     } );
+    this.stream.on( 'data', this.onData.bind( this ) );
+    this.stream.on( 'error', this.onError.bind( this ) );
 };
 
-exports.name = function name() { return 'Serial Interface on ' + this.path; };
+exports.getName = function getName() {
+    return 'File Interface at ' + this.path;
+};
+
+exports.claimnode = function claimnode() {
+    throw new Error( "File interface is input-only, cannot manage nodes" );
+};
