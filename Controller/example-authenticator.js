@@ -1,15 +1,11 @@
 #!/usr/bin/env node
 
 var express = require( 'express' ),
-    program = require( 'commander' ),
     pkginfo = require( 'pkginfo' )( module );
 
-program.version( pkginfo.version )
-    .option( '-p, --port <port>', 'Listening Port', 4000 )
-    .parse( process.argv );
-
+var port = 3999;
 var app = express();
-var server = app.listen( program.port );
+var server = app.listen( port );
 
 app.use( express.logger( 'dev' ) );
 app.use( express.bodyParser() );
@@ -30,4 +26,4 @@ app.get( '/auth/:card/:task', function( req, res ) {
     } );
 } );
 
-console.log( "Example Auth server listening on port " + program.port );
+console.log( "Example Auth server listening on port " + port );
