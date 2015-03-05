@@ -1,0 +1,31 @@
+---
+# First we define a unique id for this node
+id: tool-example
+# And maybe add a description (this is optional)
+description: tool node
+# We can specifically associate a node to an interface
+interface: Fake
+# Define our inputs... 
+inputs:
+  0: reader
+  1: abort_button
+outputs:
+  1: tool_relay
+variables:
+  enabled_timer: timer
+
+events:
+
+  reader:
+    - log 'reader validated! enabling tool'
+    - enabled_timer = 10s
+    - tool_relay = on
+
+  enabled_timer=0:
+    - log 'timer expired. disabling tool'
+    - tool_relay = off
+
+  abort_button:
+    - log 'tool aborted'
+    - tool_relay = off
+ 
